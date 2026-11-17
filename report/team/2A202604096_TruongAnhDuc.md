@@ -6,7 +6,7 @@
 - MSSV: 2A202604096
 - Email: Chưa cung cấp
 - GitHub: TADIZB (theo cấu hình Git)
-- Vai trò: Người 4 — Kiểm thử tích hợp, benchmark và ADR
+- Vai trò: Người 4 — Kiểm thử tích hợp, benchmark và ADR; làm thêm bonus B3
 
 ## 2. Phần việc phụ trách
 
@@ -16,6 +16,8 @@
 | [`src/reports/crash.json`](../../src/reports/crash.json) | Crash suite 20 điểm, sinh bằng `lab8.crash_test` |
 | [`src/reports/benchmark.json`](../../src/reports/benchmark.json) | Benchmark 4 shape × 14 claim × 5 seed, sinh bằng `lab8.benchmark` |
 | [`report/team/decision_adr.md`](decision_adr.md) | Quyết định kiến trúc dựa trên số đo |
+| [`src/bonus/`](../../src/bonus/), [`src/tests/test_bonus_swarm_verified.py`](../../src/tests/test_bonus_swarm_verified.py), [`report/team/bonus_report.md`](bonus_report.md) | Bonus B3: swarm có verifier bằng code, 12 claim đối kháng nhãn viết tay, 72 test |
+| [`TEAM.md`](../../TEAM.md), [`report/team/group_report.md`](group_report.md) | Tổng hợp thông tin 4 thành viên và báo cáo nhóm khi đủ báo cáo cá nhân |
 
 Ngoài ra, khi test tích hợp phát hiện lỗi rò ticket trong trace của workflow, tôi sửa một dòng trong `src/lab8/shapes/workflow.py` (file của Người 1) sau khi được nhóm đồng ý; chi tiết ở mục 3.3.
 
@@ -26,9 +28,10 @@ Ngoài ra, khi test tích hợp phát hiện lỗi rò ticket trong trace của 
 | Commit | Nội dung |
 | --- | --- |
 | `87a16b2` | Thêm `test_team_integration.py` (139 test ban đầu), sinh `crash.json` và `benchmark.json` |
-| `a9dcff2` | Thêm test tái hiện rò ticket vào trace; sửa trace của workflow; chạy lại toàn bộ cổng, crash, benchmark. Đây là commit ghi trong ADR |
+| `a9dcff2` | Thêm test tái hiện rò ticket vào trace; sửa trace của workflow; chạy lại toàn bộ cổng, crash, benchmark |
+| `cfca584` | Bonus B3: `src/bonus/`, 72 test bonus, `bonus_b3.json` và hai file benchmark bonus. Đây là commit chấm ghi trong ADR |
 
-Cả hai commit nằm trên nhánh `test/integration-eval`.
+Hai commit đầu nằm trên nhánh `test/integration-eval`, commit bonus trên `feat/bonus-b3-report`.
 
 ### 3.2. Thiết kế test tích hợp
 
@@ -52,9 +55,16 @@ Mọi test gọi shape qua registry `SHAPES` với chữ ký `run_claim` giữ n
 
 Chọn **workflow**: cùng pass rate 1.000 với single và orchestrator, nhưng ít tự chủ nhất, 0 model call, cost/success thấp nhất (27,86 VND mô phỏng so với 48,26 và 57,19). Swarm fail `R-swarm-C-002-s55`. Lý do đầy đủ và điều kiện làm đảo quyết định ở [ADR](decision_adr.md).
 
+### 3.5. Bonus B3 — verifier chống khuếch đại lỗi
+
+- `swarm_verified` giữ nguyên swarm, kể cả điểm yếu tin ticket ở seed 55, rồi thêm verifier bằng code: đọc lại order có cấu trúc, so `delay_days`, `status`, `damage_verified`, quote lại tối đa một vòng và ghi `verifier_override` vào trace.
+- Tự viết 12 claim đối kháng với nhãn viết tay theo luật nghiệp vụ. Trước khi chạy, tôi dự đoán swarm sẽ fail đúng 6 trial ở seed 55, verifier can thiệp 9 trial và đổi tiền ở 6 trial; kết quả đo khớp hoàn toàn.
+- Lần chạy đầu cả ba shape đều fail B-002/B-004/B-007 với `missing_approval`. Đọc trace cho thấy lỗi do tôi: id approval trong `world.json` là `A-B-002` còn claim trỏ `A-B002`. Sửa dữ liệu rồi chạy lại; không sửa nhãn cho khớp kết quả.
+- Kết quả trên bộ đối kháng: swarm 0.900 / pass^5 0.500 / variance 0.04; swarm_verified và workflow 1.000 / 1.000 / 0. Cost/success: workflow 29.17, swarm 58.84, swarm_verified 63.62 VND mô phỏng. Chi tiết ở [bonus_report.md](bonus_report.md).
+
 ## 4. Bằng chứng
 
-Môi trường: Windows AMD64, Python 3.12.10, venv `src/.venv`, pytest 8.4.2. Mọi lệnh chạy tại `src/`, tại commit `a9dcff2`.
+Môi trường: Windows AMD64, Python 3.12.10, venv `src/.venv`, pytest 8.4.2. Mọi lệnh chạy tại `src/`. Phần test tích hợp, crash và benchmark chạy tại commit `a9dcff2` và chạy lại tại commit chấm `cfca584` cho kết quả giống hệt; tại `cfca584` thêm `python -m pytest -q` → 370 passed, `python -m pytest -q tests/test_bonus_swarm_verified.py` → 72 passed, `python -m bonus.run_b3 --out reports/bonus_b3.json` → bảng trong bonus report.
 
 | Lệnh | Kết quả |
 | --- | --- |
@@ -81,7 +91,7 @@ Môi trường: Windows AMD64, Python 3.12.10, venv `src/.venv`, pytest 8.4.2. M
 ## 5. Công cụ AI đã dùng
 
 - Công cụ: Claude Code (Claude Opus) trong VS Code.
-- Dùng để: đọc đề, contract, host (`durability.py`, `policy.py`, `metrics.py`, `crash_test.py`); đề xuất và viết test tích hợp; chạy lệnh kiểm tra, crash suite, benchmark; soạn ADR và báo cáo này từ output thực tế.
+- Dùng để: đọc đề, contract, host (`durability.py`, `policy.py`, `metrics.py`, `crash_test.py`); đề xuất và viết test tích hợp; chạy lệnh kiểm tra, crash suite, benchmark; soạn ADR, báo cáo này, bonus B3 và báo cáo nhóm từ output thực tế và báo cáo cá nhân của các thành viên.
 - Tự kiểm tra: mọi số trong ADR và báo cáo được đọc lại từ `benchmark.json` / `crash.json`; chạy lại benchmark để xác nhận tái lập; test tái hiện lỗi được chạy fail trước khi sửa và pass sau khi sửa; JSON trong `src/reports/` không sửa tay; không sửa `metrics.py`, `durability.py`, `policy.py`, `config/`, `data/`.
 
 ## 6. Tự đánh giá
