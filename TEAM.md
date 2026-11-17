@@ -14,7 +14,7 @@
 |   1 | Đặng Khắc Hoàng Minh | 2A202604082 | dangkhacm@gmail.com | Chưa cung cấp | Workflow, tích hợp và báo cáo nhóm |
 |   2 | Trịnh Minh Đức | 2A202604078 | trinhduc1362k3@gmail.com | Chưa cung cấp | Single agent và nghiên cứu |
 |   3 | Nguyễn Việt Hoàng | 2A202604104 | viethoangnv0810@gmail.com | viethoang126 | Orchestrator và bảo mật handoff |
-|   4 | Trương Anh Đức | 2A202604096 | Chưa cung cấp | TADIZB | Kiểm thử tích hợp, benchmark, ADR và bonus B3 |
+|   4 | Trương Anh Đức | 2A202604096 | truongduc27032004@gmail.com | TADIZB | Kiểm thử tích hợp, benchmark, ADR và bonus B3 |
 
 Gợi ý chia vai:
 
