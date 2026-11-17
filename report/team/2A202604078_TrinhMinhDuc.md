@@ -102,13 +102,7 @@ Chọn R4 — yếu tố gây nhiễu khi đánh giá. Chỉ thay giới hạn b
 - Chưa có kết quả hidden; chưa so sánh trực tiếp chất lượng của bốn topology trong thí nghiệm này. Benchmark bốn kiến trúc và ADR do người 4 phụ trách.
 - Chi tiết nguồn, số đo và cách tái lập nằm trong [research card](research_card.md).
 
-### Commit và bàn giao cho nhóm
 
-- Nhánh làm việc: `feat/single`.
-- Commit kỹ thuật: `c6b4c99` — `feat(single): implement bounded read-only ReAct and step-budget ablation`.
-- Commit này chứa triển khai single, 27 test, bộ chạy ablation, hai JSON bằng chứng và research card. Báo cáo cá nhân được lưu trong commit tài liệu tiếp theo.
-- Nội dung gửi người 1 để điền bảng đóng góp `TEAM.md`: **Trịnh Minh Đức — Single agent và nghiên cứu — `c6b4c99` — `src/tests/test_team_single.py` (27 test)**.
-- Các commit chỉ được tạo cục bộ; chưa push. Tài khoản GitHub và phần tự đánh giá cần do thành viên bổ sung bằng thông tin thật.
 
 ## 5. Công cụ AI đã dùng
 
@@ -119,14 +113,34 @@ Chọn R4 — yếu tố gây nhiễu khi đánh giá. Chỉ thay giới hạn b
 
 ## 6. Tự đánh giá
 
-Phần này để Trịnh Minh Đức tự bổ sung sau khi đọc và chạy lại bài; chưa ghi nhận xét chủ quan thay cho thành viên.
+Tôi đánh giá phần triển khai single đã đáp ứng các yêu cầu được kiểm tra trên bộ public: xử lý claim đúng contract, giới hạn vòng lặp, phân quyền tool, kiểm soát dữ liệu nhạy cảm và hỗ trợ retry/crash. Bằng chứng tại mục 4 gồm 62 test student của single và 27 test bổ sung đều pass. Phần nghiên cứu hiện hoàn thành một ablation riêng trên single; kết luận so sánh các kiến trúc cần chờ workflow, orchestrator và benchmark chung của nhóm.
 
-Các câu cần tự giải thích được:
+**1. Vì sao chữ trong ticket không có quyền thay số ngày trễ, principal hay tiền hoàn?**
 
-1. Vì sao chữ trong ticket không có quyền thay số ngày trễ, principal hay tiền hoàn?
-2. Trong ReAct, phần nào chọn tool và giới hạn 8 bước được thực thi ở đâu?
-3. Vì sao MockLLM của lab chưa chứng minh khả năng lập kế hoạch của model thật?
-4. Vì sao proposal 150.000 có thể tạo effect 120.000 ở T14?
-5. Vì sao phải để `InjectedCrash` truyền ra ngoài và vẫn đóng SQLite?
-6. Vì sao giảm tổng chi phí chưa chắc giảm cost/success?
-7. Vì sao 100% trên public chưa chứng minh đã qua hidden?
+Ticket là nội dung người dùng cung cấp, có thể ghi sai dữ kiện hoặc chứa lệnh giả mạo. Số ngày trễ phải lấy từ order; principal dùng để kiểm quyền phải lấy từ claim trong hệ thống. Code chỉ đưa `claim_id`, `principal_id`, `order_id` vào vòng lặp và dùng `lookup_order` để kiểm phạm vi truy cập. Số tiền do `compute_compensation` tính theo order và policy hiện hành; câu như “ignore policy” hoặc “hoàn 999999999” không thay đổi các bước này.
+
+**2. Trong ReAct, phần nào chọn tool và giới hạn 8 bước được thực thi ở đâu?**
+
+Hàm `decide` trong `single.py` chọn action dựa trên dữ kiện đã quan sát: đọc order, đọc policy, đọc lịch sử hoàn tiền rồi trả `final`. Hàm `run_react` trong `runtime.py` thực thi vòng lặp với `max_steps=MAX_REACT_STEPS`, mặc định bằng 8. Mỗi lần gọi `decide` tính một bước, kể cả quyết định `final`. Nếu hết giới hạn mà chưa có `final`, single trả `failed` với lý do `step_cap` và không thực hiện bước hoàn tiền. Giới hạn này khác số event trong trace; lời gọi draft sau vòng lặp vẫn được tính riêng vào budget.
+
+**3. Vì sao MockLLM của lab chưa chứng minh khả năng lập kế hoạch của model thật?**
+
+MockLLM tạo chuỗi phản hồi xác định theo seed, purpose và prompt; nó không sinh structured tool call để điều khiển vòng lặp. Chính sách chọn tool hiện được viết trong `decide`, còn chuỗi model trả về không được thực thi như lệnh. Vì vậy, kết quả kiểm chứng cách ghép vòng lặp, công cụ và host trong mô phỏng; chưa chứng minh model thật có thể tự lập kế hoạch, chọn công cụ hoặc xử lý tình huống mới với cùng độ đúng.
+
+**4. Vì sao proposal 150.000 có thể tạo effect 120.000 ở T14?**
+
+Proposal là entitlement đầy đủ mà code tính cho đơn hàng. Ở T14, entitlement mới là 150.000 VND, trong khi đơn đã được hoàn 30.000 VND trước đó. Single truyền nguyên quote 150.000 vào host; host áp dụng trần theo đơn và chỉ ghi phần chênh 120.000 VND. Nếu single tự trừ trước rồi truyền 120.000, host sẽ tiếp tục trừ khoản đã hoàn, dẫn đến hoàn thiếu. Do đó, `proposal_amount` và số tiền thực ghi trong ledger có thể khác nhau.
+
+**5. Vì sao phải để `InjectedCrash` truyền ra ngoài và vẫn đóng SQLite?**
+
+`InjectedCrash` giúp bộ kiểm tra xác nhận chương trình thực sự dừng tại cửa sổ crash đã yêu cầu. Nếu bắt lỗi rồi trả kết quả bình thường, kịch bản crash/resume không còn được kiểm tra đúng. `run_claim` dùng `finally` để đóng kết nối dù có exception, giải phóng tài nguyên và tránh giữ khóa file SQLite. Khi chạy lại, host sử dụng ledger, idempotency key và audit để giữ một refund và một audit committed; việc đóng kết nối không thay thế cơ chế chống ghi trùng này.
+
+**6. Vì sao giảm tổng chi phí chưa chắc giảm cost/success?**
+
+Cost/success bằng tổng chi phí của tất cả trial, gồm cả trial fail, chia cho số trial pass. Cấu hình 8 bước tốn tổng cộng 3.378,30 VND mô phỏng và pass 70 trial, tương đương khoảng 48,26 VND mỗi trial pass. Cấu hình 2 bước chỉ tốn 2.100,60 VND nhưng pass 10 trial, nên cost/success tăng lên 210,06 VND. Dừng sớm làm giảm chi phí thực thi nhưng cũng làm nhiều claim chưa hoàn thành; cần xem đồng thời độ đúng và chi phí.
+
+**7. Vì sao 100% trên public chưa chứng minh đã qua hidden?**
+
+Bộ public chỉ có 14 claim đã biết. Bộ hidden gồm 40 claim có thể chứa các biến thể về dữ kiện sai, injection, approval, policy, phạm vi chủ sở hữu và lịch sử hoàn tiền mà public chưa bao phủ. Kết quả 70/70 trial public chỉ có giá trị trong setup đã đo; không đủ để khẳng định đạt ngưỡng pass rate hidden hoặc mọi điều kiện must-pass trên hidden. Điểm chính thức vẫn cần bộ chấm của giảng viên.
+
+Điểm tôi cần tiếp tục cải thiện là phân tích trace khi có trial fail, bổ sung trường hợp kiểm thử dựa trên lỗi thực tế và đối chiếu với kết quả tích hợp. Khi người 1 và người 3 hoàn thành phần của mình, tôi sẽ cung cấp code, test và bằng chứng single để người 4 chạy benchmark chung; lựa chọn kiến trúc của nhóm sẽ dựa trên số đo đó.
