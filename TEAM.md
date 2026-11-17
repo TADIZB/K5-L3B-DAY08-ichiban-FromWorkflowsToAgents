@@ -11,7 +11,7 @@
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 | Chưa cung cấp | Chưa cung cấp | Chưa cung cấp | Chưa cung cấp | Workflow, tích hợp và báo cáo nhóm |
+|   1 | Đặng Khắc Hoàng Minh | 2A202604082 | dangkhacm@gmail.com | Chưa cung cấp | Workflow, tích hợp và báo cáo nhóm |
 |   2 |        |      |       |        |         |
 |   4 | Trương Anh Đức | 2A202604096 | Chưa cung cấp | TADIZB | Kiểm thử tích hợp, benchmark và ADR |
 
@@ -26,7 +26,7 @@ Gợi ý chia vai:
 
 | Người | Vai | Commit | Test đã thêm hoặc sửa |
 | --- | --- | --- | --- |
-| Người 1 | Workflow, tích hợp và báo cáo nhóm | Chưa có commit | `src/tests/test_team_workflow.py` (đã thêm; chưa chạy được do thiếu pytest) |
+| Người 1 — Đặng Khắc Hoàng Minh | Workflow, tích hợp và báo cáo nhóm | `d153a50` | `src/tests/test_team_workflow.py` (3 test; chưa chạy tại thời điểm commit do thiếu pytest và không tải được dependency) |
 | Người 4 — Trương Anh Đức | Kiểm thử tích hợp, benchmark và ADR | `87a16b2`, `a9dcff2` | `src/tests/test_team_integration.py` (đã thêm, 142 passed) |
 
 ## Cá nhân
@@ -41,7 +41,7 @@ Ví dụ: `report/team/20241234_NguyenVanAn.md`.
 
 Sao chép mục dưới đây cho từng thành viên.
 
-## Người 1 (chưa cung cấp MSSV_HoTen)
+## Người 1 — Đặng Khắc Hoàng Minh (`2A202604082_DangKhacHoangMinh.md`)
 
 ### Phần việc phụ trách
 
@@ -53,4 +53,5 @@ Sao chép mục dưới đây cho từng thành viên.
 
 ### Bằng chứng
 
-- `src/tests/test_team_workflow.py` đã thêm; chưa chạy được vì môi trường thiếu `pytest` và cài dependency bị chặn network.
+- Commit `d153a50` triển khai workflow, thêm `src/tests/test_team_workflow.py` và cập nhật báo cáo nhóm.
+- Ba test workflow đã thêm; chưa chạy tại thời điểm commit do môi trường thiếu `pytest` và không tải được dependency.
