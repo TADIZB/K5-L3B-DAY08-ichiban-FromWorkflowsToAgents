@@ -4,14 +4,14 @@
 `Shape chọn` phải là đúng một trong: `workflow`, `single`, `orchestrator`, `swarm`. Đây là shape được chấm cổng hidden.
 
 - Shape chọn: workflow
-- Commit hash: a9dcff2
+- Commit hash: cfca584
 - Run id dẫn chứng: R-workflow-C-001-s11 … R-workflow-C-014-s55 (70 trial workflow trong `src/reports/benchmark.json`, trường `trials[*].run_id`); đối chứng R-swarm-C-002-s55 (trial fail duy nhất của swarm)
 - Pass rate / pass^5 / seed min-max / variance: 1.000 / 1.000 / 1.000–1.000 / 0.000000 (70/70 trial, 14 claim × seed 11,22,33,44,55)
 - Cost per success (mô phỏng, VND): 27.86 (tổng 1950.0 VND mô phỏng / 70 trial pass)
 - Crash safety: 20/20 (src/reports/crash.json); T11–T12 xanh trên cả workflow, single, orchestrator
 - Secret leak / approval bypass: 0 / 0 trên bộ public (forbid_substrings sạch ở 70/70 trial; test tích hợp approval hỏng 5 kiểu không tạo refund). Chỉ số hidden do giảng viên chấm
 
-Lệnh sinh bằng chứng (chạy tại `src/`, commit `a9dcff2`):
+Lệnh sinh bằng chứng (chạy tại `src/`). `benchmark.json` và `crash.json` được sinh ở commit `a9dcff2` (commit cuối sửa code ba shape). Commit chấm `cfca584` chỉ thêm `src/bonus/` (bonus B3), test và report bonus, không đổi code shape; chạy lại hai lệnh dưới tại `cfca584` cho kết quả giống hệt file đã commit:
 
 ```text
 python -m lab8.crash_test --count 20 --out reports/crash.json
@@ -52,7 +52,9 @@ Kiểm tra tích hợp (`src/tests/test_team_integration.py`, 142 test, áp dụ
 - Crash/resume ở cả ba cửa sổ, crash hai lần liên tiếp, và `crash_at` trên nhánh không ghi.
 - Ba shape cho cùng kết quả trên 14 claim ở seed 11 và 55; ticket injection không nâng được số tiền ở cả năm seed.
 
-Kết quả tại commit `a9dcff2`: `python -m pytest -q` 298 passed; `python -m pytest -q -m student -o addopts=` 248 passed (mỗi shape 62); crash suite 20/20. Chạy lại benchmark ra kết quả giống hệt file đã commit.
+Kết quả tại commit `a9dcff2`: `python -m pytest -q` 298 passed; `python -m pytest -q -m student -o addopts=` 248 passed (mỗi shape 62); crash suite 20/20. Tại commit chấm `cfca584` (thêm 72 test bonus): `python -m pytest -q` 370 passed; student 248 passed; benchmark và crash chạy lại giống hệt file đã commit.
+
+Bonus B3 (`report/team/bonus_report.md`) củng cố quyết định này: verifier bằng code kéo swarm về đúng bằng workflow (bộ đối kháng 12 claim: 0.900 → 1.000) nhưng cost/success vẫn gấp khoảng 2,2 lần workflow, vì phần còn lại của swarm không đóng góp vào quyết định tiền.
 
 ## Giới hạn
 
