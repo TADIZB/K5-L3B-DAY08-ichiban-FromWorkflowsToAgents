@@ -11,7 +11,7 @@
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 |        |      |       |        |         |
+|   1 | Chưa cung cấp | Chưa cung cấp | Chưa cung cấp | Chưa cung cấp | Workflow, tích hợp và báo cáo nhóm |
 |   2 |        |      |       |        |         |
 
 Gợi ý chia vai:
@@ -25,7 +25,7 @@ Gợi ý chia vai:
 
 | Người | Vai | Commit | Test đã thêm hoặc sửa |
 | --- | --- | --- | --- |
-| | | | |
+| Người 1 | Workflow, tích hợp và báo cáo nhóm | Chưa có commit | `src/tests/test_team_workflow.py` (đã thêm; chưa chạy được do thiếu pytest) |
 
 ## Cá nhân
 
@@ -39,16 +39,16 @@ Ví dụ: `report/team/20241234_NguyenVanAn.md`.
 
 Sao chép mục dưới đây cho từng thành viên.
 
-## MSSV_HoTen
+## Người 1 (chưa cung cấp MSSV_HoTen)
 
 ### Phần việc phụ trách
 
--
+- Workflow cố định: đọc claim/order qua read tools, tính quote bằng dữ kiện order và gọi host với quote đầy đủ.
 
 ### Đóng góp cụ thể
 
--
+- Triển khai `src/lab8/shapes/workflow.py` và thêm test cho ticket/order lệch dữ kiện, cap theo order, trace an toàn, crash/resume.
 
 ### Bằng chứng
 
--
+- `src/tests/test_team_workflow.py` đã thêm; chưa chạy được vì môi trường thiếu `pytest` và cài dependency bị chặn network.
