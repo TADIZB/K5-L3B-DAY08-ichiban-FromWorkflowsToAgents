@@ -60,6 +60,24 @@ Bonus B3 (`report/team/bonus_report.md`) củng cố quyết định này: verif
 
 - MockLLM không phải model sản xuất; workflow không gọi model nên cost của nó chỉ gồm tool call. Cost là mô phỏng, không phải hóa đơn API. Latency để `unavailable`.
 - Variance 0 của ba shape nhóm viết phản ánh logic tất định trong setup này, không chứng minh độ ổn định với model thật.
-- Benchmark chỉ có 14 claim public (70 trial/shape); 100% trên public không suy ra được pass rate hidden. Chưa có `student_drop/` nên chưa chạy self-check hidden; điểm hidden và `secret_leak_count`/`approval_bypass_count` chính thức do grader giảng viên chấm.
+- Benchmark chỉ có 14 claim public (70 trial/shape); 100% trên public không suy ra được pass rate hidden. Điểm hidden và `secret_leak_count`/`approval_bypass_count` chính thức do grader giảng viên chấm.
+
+## Tự kiểm trên student_drop (không phải điểm hidden)
+
+Lệnh (tại `src/`, `student_drop/` đặt ở `tests/student_drop/`, đã gitignore): `python -m lab8.benchmark --shapes workflow,single,orchestrator --cases tests/student_drop/hidden_claims.jsonl --world tests/student_drop/hidden_world_state.json --out reports/hidden_selfcheck.json`. Bộ này không có nhãn, nên không ra pass rate.
+
+| Shape | Trial | Lỗi (`error`) | `leak_suspect` | resolved / denied / escalated / needs_info | Tổng cost (VND mô phỏng) |
+| --- | ---: | ---: | ---: | --- | ---: |
+| workflow | 200 | 0 | 0 | 90 / 95 / 10 / 5 | 5800.00 |
+| single | 200 | 0 | 0 | 90 / 95 / 10 / 5 | 10175.70 |
+| orchestrator | 200 | 0 | 0 | 90 / 95 / 10 / 5 | 11927.60 |
+
+Kiểm thêm ngoài công cụ của lab:
+
+- Ba shape cho cùng `status` và cùng quote trên cả 200 cặp claim × seed. Swarm (chạy riêng để đối chứng) lệch 6 trial, tất cả ở seed 55 (C-H01, C-H02, C-H04, C-H13, C-H20 trả tiền khi ba shape từ chối; C-H40 ngược lại), cùng kiểu lỗi tin số ngày trong ticket như T02.
+- Quét 800 trace (3 shape + `swarm_verified`) với 271 chuỗi nhạy cảm của bộ hidden (parent secret, header, SĐT, địa chỉ, ghi chú nội bộ, tên hàng): 0 lần xuất hiện. Benchmark của lab chỉ quét `CANARY_`.
+- Kiểm độc lập: nhóm cài lại luật trong `docs/business_rules.md` bằng một script riêng (không dùng `lab8.compensation`) và đối chiếu với workflow: 0/200 trial lệch về `status` và `proposal_amount`. 40 claim gồm 18 hoàn tiền, 10 quote bằng 0, 6 approval không hợp lệ, 2 đơn hủy/đang giao, 2 sai phạm vi chủ đơn, 1 đơn đã hoàn, 1 thiếu mã đơn.
+
+Giới hạn của phần tự kiểm: bộ kiểm độc lập do chính nhóm viết từ cùng một cách hiểu luật, nên nếu nhóm hiểu sai luật thì cả hai cùng sai. Đây là bằng chứng nhất quán, không phải điểm hidden chính thức.
 - Benchmark chạy C-011 và C-012 như trial một lần; retry và crash/resume thực sự được kiểm bằng T11–T12 và test tích hợp.
 - Không sửa JSON trong `src/reports/` và không sửa thước đo để đạt ngưỡng 0.75.

@@ -53,6 +53,7 @@ Lệnh chạy tại `src/`, commit `cfca584`:
 | `python -m pytest -q -m student -o addopts=` | 248 passed; mỗi shape 62/62 |
 | `python -m lab8.crash_test --count 20 --out reports/crash.json` | `crash_safety` 20/20; T11–T12 xanh trên cả 3 shape |
 | `python -m lab8.check_submission` | 0 FAIL |
+| `python -m lab8.benchmark --shapes workflow,single,orchestrator --cases tests/student_drop/hidden_claims.jsonl --world tests/student_drop/hidden_world_state.json --out reports/hidden_selfcheck.json` | 3 × 200 trial, 0 lỗi, 0 `leak_suspect` (tự kiểm, không có nhãn) |
 
 Benchmark (`src/reports/benchmark.json`, 14 claim × seed 11/22/33/44/55, `as_of` 2026-11-15, MockLLM, giá mô phỏng):
 
@@ -97,7 +98,7 @@ Báo cáo cá nhân: [2A202604082_DangKhacHoangMinh.md](2A202604082_DangKhacHoan
 
 - **MockLLM không phải model thật.** Variance 0 của ba shape nhóm viết phản ánh code tất định; lỗi của swarm là lỗi cài sẵn chỉ ở seed % 5 == 0. Latency `unavailable`; cost là mô phỏng, không phải hóa đơn API.
 - **Corpus nhỏ.** 14 claim public (70 trial/shape) và 12 claim đối kháng tự viết. 100% trên public không suy ra được pass rate hidden; điểm hidden do grader giảng viên chấm.
-- **Chưa tự kiểm hidden.** Chưa có `student_drop/`. Khi giảng viên phát, chạy `python -m lab8.benchmark --shapes workflow,single,orchestrator --cases student_drop/hidden_claims.jsonl --world student_drop/hidden_world_state.json --out reports/hidden_selfcheck.json` để kiểm status, trace và `leak_suspect`.
+- **Tự kiểm hidden chỉ là tự kiểm.** Trên `student_drop/` (40 claim × 5 seed, `src/reports/hidden_selfcheck.json`), ba shape chạy 200/200 trial không lỗi, 0 `leak_suspect`, cùng status và quote; quét 800 trace không thấy chuỗi nhạy cảm nào; bộ kiểm luật độc lập của nhóm khớp workflow 200/200. Bộ không có nhãn và bộ kiểm do nhóm tự viết, nên đây không phải điểm hidden chính thức. Chi tiết trong ADR.
 - **Workflow cứng.** Workflow chỉ xử lý được các nhánh đã viết sẵn. Nếu hidden có loại claim cần đọc thêm nguồn tùy nội dung (homoglyph, principal lẫn), ADR đã nêu điều kiện cân nhắc chuyển sang single/orchestrator.
 - **Hướng cải thiện:** mở rộng test tích hợp với claim kiểu homoglyph và principal lẫn; thử handoff hai giai đoạn cho orchestrator (giai đoạn 2 nhận `facts` đã lọc từ order) như Người 3 đề xuất và đo xem có đáng thêm chi phí không.
 

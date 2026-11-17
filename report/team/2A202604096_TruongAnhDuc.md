@@ -85,7 +85,7 @@ Môi trường: Windows AMD64, Python 3.12.10, venv `src/.venv`, pytest 8.4.2. M
 
 - Run id: `R-workflow-C-001-s11` … `R-workflow-C-014-s55`; trial fail duy nhất `R-swarm-C-002-s55` (`status resolved != denied`).
 - Tái lập: chạy lại benchmark ra file tạm, so `by_shape` và `trials` với file đã commit → giống hệt.
-- Chưa có `student_drop/` nên chưa chạy self-check hidden. Kết quả trên chỉ là tự kiểm trên public, không phải điểm hidden chính thức.
+- Tự kiểm trên `student_drop/` (`reports/hidden_selfcheck.json`): workflow, single, orchestrator mỗi shape 200 trial, 0 lỗi, 0 `leak_suspect`, cùng status và quote. Tôi quét thêm 800 trace với 271 chuỗi nhạy cảm của bộ hidden (0 lần xuất hiện), và viết một bộ kiểm luật độc lập không dùng `lab8.compensation`: khớp workflow 200/200. Đây là tự kiểm, không phải điểm hidden chính thức; chi tiết trong ADR.
 - Lưu ý khi tự kiểm single: `-k single` chọn nhầm cả test của shape khác (242 test), vì tên test dùng chung chứa chữ `single`; lọc đúng như báo cáo của Người 2 cho 62 passed.
 
 ## 5. Công cụ AI đã dùng
@@ -98,4 +98,4 @@ Môi trường: Windows AMD64, Python 3.12.10, venv `src/.venv`, pytest 8.4.2. M
 
 Phần bàn giao của Người 4 đã đạt: bộ test chung và ma trận student xanh, crash suite 20/20 kèm T11–T12 xanh trên từng shape, benchmark đủ 4 shape, 14 claim, seed 11–55, ADR khớp số đo. Đóng góp có giá trị nhất là test tích hợp phát hiện được một lỗi rò dữ liệu mà bộ public không bắt được; lỗi này có thể chạm must-pass về secret nếu hidden có claim dán secret vào ticket.
 
-Giới hạn: kết luận chỉ đúng trong setup MockLLM, 14 claim public và bảng giá mô phỏng. Variance 0 phản ánh code tất định. Cần chạy self-check trên `student_drop/` khi giảng viên phát để kiểm workflow trên claim lạ (homoglyph, principal lẫn, đơn hủy/đang giao) trước khi coi quyết định là chắc chắn.
+Giới hạn: kết luận chỉ đúng trong setup MockLLM, 14 claim public và bảng giá mô phỏng. Variance 0 phản ánh code tất định. Tự kiểm trên `student_drop/` không thấy lỗi, rò rỉ hay bất đồng giữa các shape, nhưng bộ kiểm luật là do tôi tự viết nên chỉ chứng minh tính nhất quán; điểm hidden chính thức vẫn do giảng viên chấm.

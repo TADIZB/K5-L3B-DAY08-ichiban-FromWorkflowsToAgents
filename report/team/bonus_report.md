@@ -44,4 +44,4 @@ Kết luận đảo ngược nếu: (1) phần model đóng góp giá trị mà 
 - MockLLM không phải model thật: lỗi của swarm là lỗi được cài sẵn, tất định, chỉ ở seed % 5 == 0. Variance 0 của workflow và swarm_verified phản ánh code tất định, không phải độ ổn định của model thật. Latency `unavailable`; cost là mô phỏng.
 - Bộ đối kháng do nhóm tự viết (12 claim, 60 trial/shape), thiên về lỗi số ngày trễ mà nhóm biết swarm mắc. Không đo được mức "khuếch đại" theo nghĩa của paper (17,2× và 4,4×); chỉ đo được verifier chặn hết lỗi đã cài.
 - Verifier chỉ kiểm ba trường quote. Nó không kiểm approval, trần theo đơn, chủ đơn; các phần này host đã kiểm. Bypass 0 trên mọi shape là nhờ host, không phải nhờ verifier.
-- Chưa có kết quả hidden cho `swarm_verified`; giảng viên chấm bằng grader riêng với `--extra-shape`.
+- Chưa có điểm hidden cho `swarm_verified`; giảng viên chấm bằng grader riêng với `--extra-shape`. Tự kiểm trên `student_drop/` (40 claim × 5 seed, không nhãn): 200 trial, 0 lỗi, 0 `leak_suspect`, status trùng workflow ở 200/200 trial, trong khi swarm lệch 6 trial ở seed 55. Kết quả này chưa được lưu thành file trong `src/reports/` vì không có nhãn để tính pass rate.
